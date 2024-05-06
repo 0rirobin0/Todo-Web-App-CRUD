@@ -10,7 +10,62 @@ app.listen(5001, () => {
   console.log("server is running port:5001");
 });
 
+
+
+// ======== Middleware ============ //
+
 app.use(bodyParser.json());
+
+
+// ======== User Registration ============ //
+
+app.post('/register', (req, res) => {
+    const { username, email, password } = req.body;
+   
+  
+    // Check if the user already exists
+    db.query('SELECT * FROM user WHERE username = ? OR email = ?', [username, email], (err, results) => {
+      if (err) {
+        res.status(500).send('Internal Server Error');
+        
+      }
+  
+      // If user exists, send error response
+      if (results.length > 0) {
+        res.status(400).send('User already exists');
+      } else {
+        // If user doesn't exist, insert new user data into the database
+        db.query('INSERT INTO user (username, email, password, role) VALUES (?, ?, ?, "user")', [username, email, password], (err, result) => {
+          if (err) {
+            res.status(500).send('Internal Server Error');
+            console.log('Internal Server Error');
+          }
+          res.status(201).send('User registered successfully');
+          console.log(req.body);
+          console.log('User registered successfully');
+        });
+      }
+    });
+  });
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //============= Get todo taskby User =============//
 
@@ -32,6 +87,8 @@ app.get("/tasklist/:user_id/:task_id", (req, res) => {
     }
   );
 });
+
+
 
 //============= insert todo task =============//
 
