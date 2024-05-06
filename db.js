@@ -3,9 +3,9 @@ const mysql =require('mysql2');
 const mysqlconnection = mysql.createConnection({
 
     host:'localhost',
-    user:'root',
+    user:'robin',
     password:'robinhood',
-    database:'tasklistdb'
+    database:'todo'
 
 
 
@@ -13,7 +13,7 @@ const mysqlconnection = mysql.createConnection({
 
 });
 
-var connection=mysqlconnection.connect((err)=>{
+mysqlconnection.connect((err)=>{
     if(err)
     {
         console.log('Error in Database Connection!!!'+JSON.stringify(err,undefined,2));
@@ -25,4 +25,4 @@ var connection=mysqlconnection.connect((err)=>{
 });
 
 
-module.exports=connection;
+module.exports=mysqlconnection;
