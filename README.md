@@ -3,19 +3,53 @@
 This Projects is created using NodeJS,ExpressJS,MySQL with JWT TOken Authentication for CRUD And Authentication and Authorisation!
 
 ## Table of Methods
-- [GET](#)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+- [GET](#GET)
+- [POST](#POST)
+- [PUT](#PUT)
+- [PATCH](#PATCH)
+- [DELET](#DELETE)
 
-## Installation
-Step-by-step instructions on how to install the project.
+## GET
+localhost:5001/tasklist/1000/14       
+Here /user_id/task_id
 
-## Usage
-Instructions on how to use the project. Include examples.
+## POST 
+localhost:5001/tasklist
+{
+    
+     
+     "user_id":1000,
+     "task_title":"Playing",
+     "description":"Football",
+     "status":"In queue", 
+     "timestamp":"24-5-6"
 
-## Contributing
-Guidelines for contributing to the project.
+}
 
-## License
-This project is licensed under the [License Name](link-to-license).
+## PUT
+localhost:5001/tasklist/:10
+Here /task_id
+
+
+{
+
+     "task_title":"Eating",
+     "description":"Lunch",
+     "status":"Done"
+
+}
+
+
+## PATCH
+localhost:5001/tasklist/10/status
+{
+
+ "status":"Complete"
+
+}
+
+## DELETE
+localhost:5001/tasklist/14
+Here /task_id
+
+
