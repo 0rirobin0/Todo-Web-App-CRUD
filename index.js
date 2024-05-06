@@ -1,6 +1,8 @@
 const bodyParser = require("body-parser");
 const express = require("express");
 const db = require("./db");
+const jwt=require("jsonwebtoken");
+const secretkey ='robinhood';
 
 var app = express();
 
@@ -16,8 +18,30 @@ app.listen(5001, () => {
 
 app.use(bodyParser.json());
 
+//Token verifier
+function verifytoken(req, res, next) {
+    // Get auth header value
+    const bearerHeader = req.headers['authorization'];
+
+    if (typeof bearerHeader !== 'undefined') {
+        // Split the header by space
+        const bearer = bearerHeader.split(' ');
+        // Get token from array
+        const bearerToken = bearer[1];
+   
+        req.token = bearerToken;
+        // Next middleware
+        next();
+    } else {
+    
+        res.status(403).send("Forbidden");
+    }
+}
+
 
 // ======== User Registration ============ //
+
+
 
 app.post('/register', (req, res) => {
     const { username, email, password } = req.body;
@@ -48,15 +72,132 @@ app.post('/register', (req, res) => {
     });
   });
 
+  // ======== User Login and JWT Authentication ============ //
+
+app.post('/login',(req,res)=>
+{
+ const {username,password} =req.body;
+ const user=req.body;
+ 
+    // Check if the user exists or login
+    db.query('SELECT * FROM user WHERE username = ? AND password = ?', [username,password], (err, results) => {
+        if (err) {
+          res.status(500).send('Internal Server Error');
+          
+        }
+    
+        // If user exists, send error response
+        if (results.length > 0) {
+    
+            console.log("Authienticated!!");
+            // jwt token creation
+            jwt.sign({user},secretkey,{expiresIn:"300s"},(err,token)=>
+        {
+             res.json(token);
+        });
+
+        } 
+
+        else
+        {
+            res.status(400).send('You don\'t have an account ! Register Please or check username or password');
+            console.log('You don\'t have an account ! Register Please or check username or password');
+        }
+
+
+
+});
+
+});
+
+//============= Get profile by User authenticated =============//
+
+// app.get('/profile',verifytoken,(req,res)=>
+// {
+//     jwt.verify(req.token,secretkey,(err,authdata)=>
+// {
+//    if(err)
+//    {
+//     res.send("Invalid Token");
+//    }
+//    else
+//    {
+//     res.json(
+//         {
+//             message:"Profile accessed",
+//             authdata
+//         }
+       
+//     )
+
+//    }
+
+// });
+
+// });
+
+
+
+
+
+
+
+//============= Get todo tasklist by User authentication =============//
+
+
+app.get("/tasklist",verifytoken, (req, res) => {
+    
+   var userid;
+    
+
+    // verify token
+    jwt.verify(req.token,secretkey,(err,authdata)=>
+    {
+        
+        
+       if(err)
+       {
+        res.send("Invalid Token");
+       }
+       else
+       {
+        
+        const username= authdata.user.username;
+        db.query("SELECT user_id FROM user WHERE username = ?",[username],(err,results)=>
+    {
+         userid = results[0].user_id;
+       // console.log(userid);
+
+         db.query(
+            "SELECT * FROM tasklist WHERE user_id = ?",
+            [userid],
+            (err, userRows) => {
+              if (err) {
+                console.log("Error getting user task" + err);
+                res.status(500).send("Error getting user task");
+              } else {
+                console.log("User Data is Fetched");
+                res.status(200).send(userRows);
+                console.log(userRows);
+              }
+            }
+          );
+         
+    });
+ 
   
 
+       
+    
+       }
+    
+    });
+
+    
 
 
-
-
-
-
-
+    
+  });
 
 
 
@@ -69,24 +210,24 @@ app.post('/register', (req, res) => {
 
 //============= Get todo taskby User =============//
 
-app.get("/tasklist/:user_id/:task_id", (req, res) => {
-  const userid = req.params.user_id;
-  const taskid = req.params.task_id;
-  db.query(
-    "SELECT * FROM tasklist WHERE user_id = ? AND task_id = ?",
-    [userid,taskid],
-    (err, userRows) => {
-      if (err) {
-        console.log("Error getting user task" + err);
-        res.status(500).send("Error getting user task");
-      } else {
-        console.log("User Data is Fetched");
-        res.status(200).send(userRows);
-        console.log(userRows);
-      }
-    }
-  );
-});
+// app.get("/tasklist/:user_id/:task_id", (req, res) => {
+//   const userid = req.params.user_id;
+//   const taskid = req.params.task_id;
+//   db.query(
+//     "SELECT * FROM tasklist WHERE user_id = ? AND task_id = ?",
+//     [userid,taskid],
+//     (err, userRows) => {
+//       if (err) {
+//         console.log("Error getting user task" + err);
+//         res.status(500).send("Error getting user task");
+//       } else {
+//         console.log("User Data is Fetched");
+//         res.status(200).send(userRows);
+//         console.log(userRows);
+//       }
+//     }
+//   );
+// });
 
 
 
