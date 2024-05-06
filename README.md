@@ -7,7 +7,7 @@ This Projects is created using NodeJS,ExpressJS,MySQL with JWT TOken Authenticat
 - [POST](#POST)
 - [PUT](#PUT)
 - [PATCH](#PATCH)
-- [DELET](#DELETE)
+- [DELETE](#DELETE)
 
 ## GET
 localhost:5001/tasklist/1000/14       
